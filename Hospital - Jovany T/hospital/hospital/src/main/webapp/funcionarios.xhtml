@@ -1,0 +1,113 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <h2 class="page-header">Gerenciar Funcinários</h2>
+        <br/>
+        <h:form id="formPrincipal">
+            <p:messages id="messages" showDetail="true" closable="true" />
+
+            <div align="center">
+                <p:dataTable var="lista" value="#{funcionariosBean.funcionarios}"
+                             id="tabela" emptyMessage="Nenhum registro encontrado"
+                             paginatorTemplate="{RowsPerPageDropdown} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true" rows="10" rowsPerPageTemplate="5,10,25,50,100,9999" style="width:100%">
+
+                    <p:column headerText="Código" sortBy="#{lista.idFuncionario}" filterBy="#{lista.idFuncionario}">
+                        <h:outputText value="#{lista.idFuncionario}" />
+                    </p:column>
+                    <p:column headerText="Nome" sortBy="#{lista.nomeFuncionario}" filterBy="#{lista.nomeFuncionario}">
+                        <h:outputText value="#{lista.nomeFuncionario}" />
+                    </p:column>
+                    <p:column headerText="Opções" exportable="false">
+                        <center>
+                            <p:commandButton icon="ui-icon-pencil" value="Editar" onclick="PF('record').show();"> 
+                                <f:setPropertyActionListener target="#{funcionariosBean.funcionario}"
+                                                             value="#{lista}" />
+                            </p:commandButton>
+
+                            <p:commandButton icon="ui-icon-trash" value="Deletar" onclick="PF('remove').show();"> 
+                                <f:setPropertyActionListener target="#{funcionariosBean.funcionario}"
+                                                             value="#{lista}" />
+                            </p:commandButton> 
+                        </center>
+                    </p:column>
+                </p:dataTable>
+
+                <p:column>
+                    <p:commandButton icon="ui-icon-plus" value="Novo" onclick="PF('record').show();">  
+                    </p:commandButton> 
+                </p:column>
+            </div>
+
+            <div align="center">
+                <h3>Exportar dados da página</h3>
+
+                <h:commandLink>
+                    <p:graphicImage name="images/exports/excel.png" width="24"/>
+                    <p:dataExporter type="xls" target="tabela" fileName="arq" />
+                </h:commandLink>
+
+                <h:commandLink>
+                    <p:graphicImage name="images/exports/pdf.png" width="24"/>
+                    <p:dataExporter type="pdf" target="tabela" fileName="arq"/>
+                </h:commandLink>
+
+                <h:commandLink>
+                    <p:graphicImage name="images/exports/csv.png" width="24"/>
+                    <p:dataExporter type="csv" target="tabela" fileName="arq" />
+                </h:commandLink>
+
+                <h:commandLink>
+                    <p:graphicImage name="images/exports/xml.png" width="24"/>
+                    <p:dataExporter type="xml" target="tabela" fileName="arq" />
+                </h:commandLink>
+            </div>
+               
+            <p:dialog header="Novo" widgetVar="record" modal="false">
+                              
+                <p:panelGrid id="panelRecord" columns="2"> 
+                    Nome:
+                    <p:inputText id="nomeFuncionario" value="#{funcionariosBean.funcionario.nomeFuncionario}" />
+                  
+                    <p:outputLabel for="cpf" value="CPF:" />
+                     <p:inputMask id="cpf" value="#{funcionariosBean.funcionario.cpf}" mask="99999999999"/>
+                     
+                    <p:outputLabel for="rg" value=" RG:" />
+                     <p:inputMask id="rg" value="#{funcionariosBean.funcionario.rg}" mask="999999999"/>
+                  
+                     <p:outputLabel for="crm" value="CRM:" />
+                     <p:inputMask id="crm" value="#{funcionariosBean.funcionario.crm}" mask="99999"/>
+ 
+                    Tipo Funcionário:                      
+                    <p:selectOneMenu id="tipoFuncionarioId" value="#{funcionariosBean.tipoFuncionarioId}" style="width:150px">
+                        <c:forEach items="#{tipoFuncionarioBean.tipoFuncionarios}" var="tfunc" >
+                        <f:selectItem itemLabel="#{tfunc.nomeTipoFuncionario}" itemValue="#{tfunc.idtipoFuncionario}" />
+                        </c:forEach> 
+                    </p:selectOneMenu>
+                    Endereço do Funcionario:                      
+                    <p:selectOneMenu id="enderecoId"  value="#{funcionariosBean.enderecoId}" style="width:150px">
+                        <c:forEach items="#{enderecosBean.enderecosList}" var="end" >
+                        <f:selectItem itemLabel="#{end.cep}" itemValue="#{end.idEndereco}" />
+                        </c:forEach> 
+                    </p:selectOneMenu>                 
+                </p:panelGrid> 
+                   
+                <br/>
+                <p:commandButton value="Salvar"  
+                                 actionListener="#{funcionariosBean.salvar}" onclick="record.hide()" alt="Record"/> 
+            </p:dialog>
+
+            <p:dialog header="Deletar" widgetVar="remove" modal="false"> 
+                Você tem certeza?
+                <p:commandButton value="Deletar"  
+                                 actionListener="#{funcionariosBean.remover}" onclick="remove.hide()" alt="Delete" /> 
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
